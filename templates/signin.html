@@ -5,15 +5,39 @@
  
     
     <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
- 
     <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
-    <script src="../static/js/jquery-2.2.3.min.js"></script>
-    <script src="../static/js/signIn.js"></script>
-    <link href="../static/signup.css" rel="stylesheet">
+    <script src="../static/js/jquery-2.2.3.min.js"></script>    
+    <link href="../static/signup.css" rel="stylesheet">    
     
   </head>
  
   <body>
+
+  <script>
+    function onSubmit(){
+      var xmlhttp = new XMLHttpRequest();
+      var url = "http://localhost:5000/signIn";
+
+      var json = {"linuxCommand" : document.forms["myForm"]["linuxCommand"].value,
+                "inputEmail" :document.forms["myForm"]["inputEmail"].value,
+                "inputPassword" : document.forms["myForm"]["inputPassword"].value}
+
+      
+      xmlhttp.onreadystatechange = function() {
+          if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+              var myArr = JSON.parse(xmlhttp.responseText);
+              myFunction(myArr);
+          }
+      };
+      xmlhttp.open("POST", url, true);
+      xmlhttp.setRequestHeader("Content-type", "application/json");
+        xmlhttp.send(JSON.stringify(json));
+
+      function myFunction(arr) {               
+          document.getElementById("result").innerHTML = arr.commandResponse;
+      }
+    }
+    </script>
  
     <div class="container">
       <div class="header">
@@ -37,9 +61,9 @@
           <label for="inputPassword" class="sr-only">Password</label>
           <input type="password" name="inputPassword" id="inputPassword" class="form-control" placeholder="Password" required>   
 
-          <div class ="result">hi</div>    
+          <div id ="result"></div>    
            
-          <button id="btnSignIn" class="btn btn-lg btn-primary btn-block" type="button">Sign in</button>
+          <button id="btnSignIn" class="btn btn-lg btn-primary btn-block" type="button" onclick="onSubmit()">Sign in</button>
       </form>
       </div>
  

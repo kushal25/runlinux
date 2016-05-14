@@ -9,18 +9,18 @@ app = Flask(__name__)
 # app.config['MONGO_HOST'] = '127.10.85.2'
 # app.config['MONGO_PORT'] = 27017
 # app.config['MONGO_DBNAME'] = 'runlinux'
-# app.config['MONGO_URI'] = 'mongodb://127.10.85.2:27017/runlinux'
-# app.config['MONGO_USERNAME'] = 'admin'
-# app.config['MONGO_PASSWORD'] = 'dp53nstHebqE'
-# mongo = PyMongo(app, config_prefix='MONGO')
-mongo = PyMongo(app) #for local MongDB
+app.config['MONGO_URI'] = 'mongodb://127.10.85.2:27017/runlinux'
+app.config['MONGO_USERNAME'] = 'admin'
+app.config['MONGO_PASSWORD'] = 'dp53nstHebqE'
+mongo = PyMongo(app, config_prefix='MONGO')
+
+# mongo = PyMongo(app) #for local MongDB
 
 
-from pymongo import Connection
-connection = Connection()
-print(connection.database_names())	
-db = connection.runlinux
-collection = db.linuxCommand
+# from pymongo import Connection
+# connection = Connection()
+# db = connection.runlinux
+# collection = db.linuxCommand
 
 @app.route("/")
 def main():
@@ -61,20 +61,21 @@ def signIn():
 	 	  _linuxCommand = json.get("linuxCommand")
 	 	  _email = json.get("inputEmail")
 	 	  _password = json.get("inputPassword")
-	 	  
-	 	  # validate the received values
-	 	  if _email and _password and _linuxCommand:	 	  		 		 	 
-	 	  	p = subprocess.Popen(_linuxCommand,
-                     stdout=subprocess.PIPE,
-                     stderr=subprocess.PIPE,
-                     stdin=subprocess.PIPE)
-	 	  	out,err = p.communicate()	 	  		  	 	 
-	 	  	js = {'commandResponse' : out}          	 	  	  
-	 	  	return jsonify(js)	 	  
-		  else:
-		  	return json.dumps({'html':'<span>Enter the required fields</span>'})
+
+	 	   # validate the received values
+	 	  if _email and _password and _linuxCommand:
+	 	  	res = mongo.db.linuxCommand.find({'email' : _email})
+	 	  	if(res[0].get("email") == _email and res[0].get("password") == _password):
+	 	  		p = subprocess.Popen(_linuxCommand,stdout=subprocess.PIPE,stderr=subprocess.PIPE,stdin=subprocess.PIPE)
+	 	  		out,err = p.communicate()
+	 	  		js = {'commandResponse' : out}
+	 	  		return jsonify(js)
+	 	  	else:
+	 	  		return jsonify({'commandResponse' : 'no user found'})
+	 	  else:
+	 	  	return jsonify({'commandResponse' : 'Enter the required fields'})
 	 else:
-	 	return "WTF"
+	 	return jsonify({'commandResponse' : 'Cannot Find JSON type'})
 
 @app.route('/logout')
 def logout():   

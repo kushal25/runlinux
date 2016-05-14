@@ -1,6 +1,6 @@
 $(function() {
-    $('#btnSignIn').click(function() {       
-        $.ajax({
+    $('#btnSignIn').submit(function() {        
+        $.ajax({            
             url: '/signIn',
             data: $('form').serialize(),
             type: 'POST',
@@ -11,5 +11,5 @@ $(function() {
                 console.log(error);
             }
         });
-    });
+    });    
 });    
