@@ -41,12 +41,10 @@ def linuxCommand():
 @app.route('/signUp',methods=['POST'])
 def signUp():
  
-    # read the posted values from the UI
     _name = request.form['inputName']
     _email = request.form['inputEmail']
     _password = request.form['inputPassword']
  
-    # validate the received values
     if _name and _email and _password:
         return json.dumps({'html':'<span>All fields good !!</span>'})
         '''return redirect(url_for('linuxCommand'))'''
@@ -66,13 +64,12 @@ def signIn():
 	 	  
 	 	  # validate the received values
 	 	  if _email and _password and _linuxCommand:	 	  		 		 	 
-	 	  	p = subprocess.Popen(_linuxCommand, # <----
+	 	  	p = subprocess.Popen(_linuxCommand,
                      stdout=subprocess.PIPE,
                      stderr=subprocess.PIPE,
                      stdin=subprocess.PIPE)
 	 	  	out,err = p.communicate()	 	  		  	 	 
-	 	  	js = {'commandResponse' : out}          	 	  
-	 	  	print(js)	 	  	
+	 	  	js = {'commandResponse' : out}          	 	  	  
 	 	  	return jsonify(js)	 	  
 		  else:
 		  	return json.dumps({'html':'<span>Enter the required fields</span>'})
