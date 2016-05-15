@@ -20,7 +20,6 @@ mongo = PyMongo(app, config_prefix='MONGO')
 # from pymongo import Connection
 # connection = Connection()
 # db = connection.runlinux
-# collection = db.linuxCommand
 
 @app.route("/")
 def main():
@@ -28,58 +27,63 @@ def main():
 
 @app.route('/showSignUp')
 def showSignUp():
-    return render_template('signup.html')
+	return render_template('signup.html')
 
 @app.route('/showSignIn')
 def showSignIn():
-    return render_template('signin.html')
+	return render_template('signin.html')
 
 @app.route('/linuxCommand')
 def linuxCommand():
-    return render_template('linuxCommand.html')    
+	return render_template('linuxCommand.html')    
 
 @app.route('/signUp',methods=['POST'])
-def signUp():
- 
-    _name = request.form['inputName']
-    _email = request.form['inputEmail']
-    _password = request.form['inputPassword']
- 
-    if _name and _email and _password:
-        return json.dumps({'html':'<span>All fields good !!</span>'})
-        '''return redirect(url_for('linuxCommand'))'''
-    else:
-        return json.dumps({'html':'<span>Enter the required fields</span>'})
+def signUp():	
+	if request.headers['Content-Type'] == 'application/json':
+		json = request.json			
+		_name = json.get("inputName")
+		_email = json.get("inputEmail")
+		_password = json.get("inputPassword")
+		reqJson = {"name" : _name,"email" : _email, "password" : _password}		
+		if _email and _password and _name:		
+			res = mongo.db.linuxCommand.find({'email' : _email})								
+			if(res.count()>0):			
+				return jsonify({'commandResponse' : 'user already exists'})
+			else:						
+				abc = mongo.db.linuxCommand.save(reqJson)			
+				return jsonify({'commandResponse' : 'user successfully registered'})
+		else:
+			return jsonify({'commandResponse' : 'Enter the required fields'})
+	else:
+	 	return jsonify({'commandResponse' : 'Cannot Find JSON type'})
 
 
 @app.route('/signIn',methods=['POST'])
-def signIn(): 	
-	 if request.headers['Content-Type'] == 'text/plain':
-	 	return "Text Message: " + request.data
-	 elif request.headers['Content-Type'] == 'application/json':	 			 	  
-	 	  json = request.json;		 	 
-	 	  _linuxCommand = json.get("linuxCommand")
-	 	  _email = json.get("inputEmail")
-	 	  _password = json.get("inputPassword")
-
-	 	   # validate the received values
-	 	  if _email and _password and _linuxCommand:
-	 	  	res = mongo.db.linuxCommand.find({'email' : _email})
-	 	  	if(res[0].get("email") == _email and res[0].get("password") == _password):
-	 	  		p = subprocess.Popen(_linuxCommand,stdout=subprocess.PIPE,stderr=subprocess.PIPE,stdin=subprocess.PIPE)
-	 	  		out,err = p.communicate()
-	 	  		js = {'commandResponse' : out}
-	 	  		return jsonify(js)
-	 	  	else:
-	 	  		return jsonify({'commandResponse' : 'no user found'})
-	 	  else:
-	 	  	return jsonify({'commandResponse' : 'Enter the required fields'})
+def signIn(): 		 
+	 if request.headers['Content-Type'] == 'application/json':	 			 	  
+		  json = request.json	 	 
+		  _linuxCommand = json.get("linuxCommand")
+		  _email = json.get("inputEmail")
+		  _password = json.get("inputPassword")		  
+		   # validate the received values
+		  if _email and _password and _linuxCommand:
+			res = mongo.db.linuxCommand.find({'email' : _email})
+			if(res[0].get("email") == _email and res[0].get("password") == _password):
+				comm = _linuxCommand.split(' ')	 	  			  	
+				p = subprocess.Popen(comm,stdout=subprocess.PIPE,stderr=subprocess.PIPE,stdin=subprocess.PIPE)
+				out,err = p.communicate()
+				js = {'commandResponse' : out}
+				return jsonify(js)
+			else:
+				return jsonify({'commandResponse' : 'no user found'})
+		  else:
+			return jsonify({'commandResponse' : 'Enter the required fields'})
 	 else:
-	 	return jsonify({'commandResponse' : 'Cannot Find JSON type'})
+		return jsonify({'commandResponse' : 'Cannot Find JSON type'})
 
 @app.route('/logout')
 def logout():   
-    return redirect(url_for('main'))        
+	return redirect(url_for('main'))        
 
 if __name__ == "__main__":
 	app.run()
