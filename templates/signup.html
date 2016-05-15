@@ -29,14 +29,17 @@
       xmlhttp.send(JSON.stringify(json));
       xmlhttp.onreadystatechange = function() {
           if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-              var myArr = JSON.parse(xmlhttp.responseText);
-              console.log(myArr)
+              var myArr = JSON.parse(xmlhttp.responseText);           
               myFunction(myArr);
           }
       };
       function myFunction(arr) {        
            console.log(typeof arr)       
           document.getElementById("result").innerHTML = arr.commandResponse;
+           if(arr.flag==1)
+          {
+             location.href = "http://localhost:5000/linuxCommand"; 
+          } 
       }
     }
     </script>

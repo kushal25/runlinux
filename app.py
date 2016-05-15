@@ -35,7 +35,24 @@ def showSignIn():
 
 @app.route('/linuxCommand')
 def linuxCommand():
-	return render_template('linuxCommand.html')    
+	return render_template('linuxCommand.html') 
+
+@app.route('/command', methods=['POST'])
+def command():   
+	 if request.headers['Content-Type'] == 'application/json':	 			 	  
+		  json = request.json	 	 
+		  _linuxCommand = json.get("linuxCommand")		 
+		   # validate the received values
+		  if _linuxCommand:
+		  	comm = _linuxCommand.split(' ')
+			p = subprocess.Popen(comm,stdout=subprocess.PIPE,stderr=subprocess.PIPE,stdin=subprocess.PIPE)
+			out,err = p.communicate()
+			js = {'commandResponse' : out}
+			return jsonify(js)
+		  else:
+		  	return jsonify({'commandResponse' : 'Enter the required fields'})
+	 else:
+		return jsonify({'commandResponse' : 'Cannot Find JSON type'})
 
 @app.route('/signUp',methods=['POST'])
 def signUp():	
@@ -51,7 +68,7 @@ def signUp():
 				return jsonify({'commandResponse' : 'user already exists'})
 			else:						
 				abc = mongo.db.linuxCommand.save(reqJson)			
-				return jsonify({'commandResponse' : 'user successfully registered'})
+				return jsonify({'commandResponse' : 'user successfully registered','flag' : 1})			
 		else:
 			return jsonify({'commandResponse' : 'Enter the required fields'})
 	else:
@@ -61,21 +78,18 @@ def signUp():
 @app.route('/signIn',methods=['POST'])
 def signIn(): 		 
 	 if request.headers['Content-Type'] == 'application/json':	 			 	  
-		  json = request.json	 	 
-		  _linuxCommand = json.get("linuxCommand")
+		  json = request.json	 	 	
 		  _email = json.get("inputEmail")
-		  _password = json.get("inputPassword")		  
-		   # validate the received values
-		  if _email and _password and _linuxCommand:
+		  _password = json.get("inputPassword")		  		
+		  if _email and _password:
 			res = mongo.db.linuxCommand.find({'email' : _email})
-			if(res[0].get("email") == _email and res[0].get("password") == _password):
-				comm = _linuxCommand.split(' ')	 	  			  	
-				p = subprocess.Popen(comm,stdout=subprocess.PIPE,stderr=subprocess.PIPE,stdin=subprocess.PIPE)
-				out,err = p.communicate()
-				js = {'commandResponse' : out}
-				return jsonify(js)
+			if(res.count()>0):
+				if(res[0].get("email") == _email and res[0].get("password") == _password):
+					return jsonify({'commandResponse' : 'user loggedin successfully', 'flag' : 1})
+				else:
+					return jsonify({'commandResponse' : 'Incorrect Credentials'})
 			else:
-				return jsonify({'commandResponse' : 'no user found'})
+				return jsonify({'commandResponse' : 'No User Found'})
 		  else:
 			return jsonify({'commandResponse' : 'Enter the required fields'})
 	 else:

@@ -18,7 +18,7 @@
       var xmlhttp = new XMLHttpRequest();
       var url = "http://localhost:5000/signIn";
 
-      var json = {"linuxCommand" : document.forms["myForm"]["linuxCommand"].value,
+      var json = {
                 "inputEmail" :document.forms["myForm"]["inputEmail"].value,
                 "inputPassword" : document.forms["myForm"]["inputPassword"].value}
 
@@ -35,6 +35,10 @@
 
       function myFunction(arr) {               
           document.getElementById("result").innerHTML = arr.commandResponse;
+          if(arr.flag==1)
+          {
+             location.href = "http://localhost:5000/linuxCommand"; 
+          }                          
       }
     }
     </script>
@@ -53,9 +57,7 @@
  
       <div class="jumbotron">
         <h1>Signin</h1>
-        <form class="form-signin" name="myForm">      
-          <label for="linuxCommand" class="sr-only">Linux Command</label>
-          <input type="name" name="linuxCommand" id="linuxCommand" class="form-control" placeholder="Linux Command" required autofocus>  
+        <form class="form-signin" name="myForm" action="/linuxCommand">              
           <label for="inputEmail" class="sr-only">Email address</label>
           <input type="email" name="inputEmail" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
           <label for="inputPassword" class="sr-only">Password</label>
