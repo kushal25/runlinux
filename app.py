@@ -16,11 +16,6 @@ mongo = PyMongo(app, config_prefix='MONGO')
 
 # mongo = PyMongo(app) #for local MongDB
 
-
-# from pymongo import Connection
-# connection = Connection()
-# db = connection.runlinux
-
 @app.route("/")
 def main():
 	return render_template('index.html')
@@ -45,9 +40,12 @@ def command():
 		   # validate the received values
 		  if _linuxCommand:
 		  	comm = _linuxCommand.split(' ')
-			p = subprocess.Popen(comm,stdout=subprocess.PIPE,stderr=subprocess.PIPE,stdin=subprocess.PIPE)
+			p = subprocess.Popen(comm,shell=False,stdout=subprocess.PIPE,stderr=subprocess.PIPE,stdin=subprocess.PIPE)
 			out,err = p.communicate()
-			js = {'commandResponse' : out}
+			if(out):
+				js = {'commandResponse' : out}
+			else:
+				js = {'commandResponse' : err}
 			return jsonify(js)
 		  else:
 		  	return jsonify({'commandResponse' : 'Enter the required fields'})
