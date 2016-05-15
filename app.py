@@ -81,9 +81,9 @@ def signIn():
 	 else:
 		return jsonify({'commandResponse' : 'Cannot Find JSON type'})
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET'])
 def logout():   
-	return redirect(url_for('main'))        
+	return render_template('signin.html')       
 
 if __name__ == "__main__":
 	app.run()
