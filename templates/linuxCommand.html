@@ -8,47 +8,12 @@
  
     <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
     <script src="../static/js/jquery-2.2.3.min.js"></script>   
-    <link href="../static/signup.css" rel="stylesheet">
+    <link href="../static/css/signup.css" rel="stylesheet">
+    <script type="text/javascript" src="../static/js/command.js"></script>
     
   </head>
  
   <body>
-
-  <script>
-
-  function onSubmit(){
-      var xmlhttp = new XMLHttpRequest();
-      var url = "http://localhost:5000/command";
-
-      var json = {"linuxCommand" : document.forms["myForm"]["linuxCommand"].value}
-
-      
-      xmlhttp.onreadystatechange = function() {
-          if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-              var myArr = JSON.parse(xmlhttp.responseText);
-              myFunction(myArr);
-          }
-      };
-      xmlhttp.open("POST", url, true);
-      xmlhttp.setRequestHeader("Content-type", "application/json");
-        xmlhttp.send(JSON.stringify(json));
-
-      function myFunction(arr) {               
-          document.getElementById("resp").innerHTML = arr.commandResponse;
-      }
-    }
-    
-     
-      function logout()
-      {
-        var xmlhttp = new XMLHttpRequest();
-        var url = "http://localhost:5000/logout";            
-        xmlhttp.open("GET", url, true);              
-      }
-     
-    
-  </script>
- 
     <div class="container">
       <div class="header">
         <nav>
@@ -60,21 +25,16 @@
       </div>
  
       <div class="jumbotron">
-        <h1>Run Linux Commands</h1>
+        <h2>Run Linux Commands</h2>
         <form class="form-signin" name="myForm">
         <label for="command" class="sr-only">Enter Command</label>
-        <input type="name" name="linuxCommand" id="linuxCommand" class="form-control" placeholder="Name" required autofocus> <br>                
-        <button id="exCommand" class="btn btn-lg btn-primary btn-block" type="button" onclick="onSubmit()">Execute Command</button>
-        <div id="resp"><div>
+        <input type="name" name="linuxCommand" id="linuxCommand" class="form-control" placeholder="Linux Command" required autofocus> <br>  
+         <div class="form-group">    
+            <textarea readonly class="form-control" rows="5" id="resp" placeholder="Response"></textarea>
+         </div>              
+        <button id="exCommand" class="btn btn-lg btn-primary btn-block" type="button" src="command.js" onclick="onSubmit()">Execute Command</button>               
       </form>
       </div>
- 
-       
-    <!--
-      <footer class="footer">
-        <p>&copy; Company 2015</p>
-      </footer> 
-      -->
  
     </div>
   </body>

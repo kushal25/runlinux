@@ -1,16 +1,27 @@
-$(function() {
-    $('#btnSignUp').click(function() {
+    function onSubmit(){
+      var xmlhttp = new XMLHttpRequest();
+      var url = "http://localhost:5000/signUp";
 
-        $.ajax({
-            url: '/signUp',
-            data: $('form').serialize(),
-            type: 'POST',
-            success: function(response) {
-                console.log(response);
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
-    });
-});    
+      var json = {"inputName" : document.forms["myForm"]["inputName"].value,
+                "inputEmail" :document.forms["myForm"]["inputEmail"].value,
+                "inputPassword" : document.forms["myForm"]["inputPassword"].value}
+
+            
+      xmlhttp.open("POST", url, true);
+      xmlhttp.setRequestHeader("Content-type", "application/json");      
+      xmlhttp.send(JSON.stringify(json));
+      xmlhttp.onreadystatechange = function() {
+          if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+              var myArr = JSON.parse(xmlhttp.responseText);           
+              myFunction(myArr);
+          }
+      };
+      function myFunction(arr) {        
+           console.log(typeof arr)       
+          document.getElementById("result").innerHTML = arr.commandResponse;
+           if(arr.flag==1)
+          {
+             location.href = "http://localhost:5000/linuxCommand"; 
+          } 
+      }
+    }
